@@ -32,7 +32,7 @@ GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
 ## Notes
 
-Describe any challenges encountered while building the app.
+When I was implementing the edit functionality of a particular task item, since there was no video walkthrough I could refer to, I had to look up the document provided by CodePath as well as the official Android documentation to figure out how Intent does and how to the send messages back and forth. In the process, my app crashed for a few times, since I used a function call wrong, i.e., instead of using getIntExtra, I used getStringExtra to try to retrieve an int value. But at the end, I figured it all out, and it was all worth the effort.
 
 ## License
 
