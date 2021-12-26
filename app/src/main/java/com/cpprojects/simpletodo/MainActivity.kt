@@ -1,5 +1,6 @@
 package com.cpprojects.simpletodo
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -12,16 +13,26 @@ import java.io.File
 import java.io.IOException
 import java.nio.charset.Charset
 
+
 class MainActivity : AppCompatActivity() {
 
     var listOfTasks = mutableListOf<String>()
     lateinit var adapter : TaskItemAdapter
 
+    val REQUEST_CODE = 20
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val longClickListener = object : TaskItemAdapter.OnLongClickListener {
+        val clickListener = object : TaskItemAdapter.OnClickListener {
+            override fun onItemClicked(position: Int) {
+                val i = Intent(this@MainActivity, EditActivity::class.java)
+                i.putExtra("text", listOfTasks[position])
+                i.putExtra("position", position)
+                startActivityForResult(i, REQUEST_CODE) // brings up the second activity
+            }
+
             override fun onItemLongClicked(position: Int) {
                 // remove the item from the list
                 listOfTasks.removeAt(position)
@@ -39,7 +50,7 @@ class MainActivity : AppCompatActivity() {
         loadItems()
 
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
-        adapter = TaskItemAdapter(listOfTasks, longClickListener)
+        adapter = TaskItemAdapter(listOfTasks, clickListener)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -59,6 +70,24 @@ class MainActivity : AppCompatActivity() {
             inputTextField.setText("")
 
             // save the tasks
+            saveItems()
+        }
+    }
+
+    // handle the result of the sub-activity
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        // REQUEST_CODE is defined above
+        if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
+            // Extract name value from result extras
+            val editedTask = data?.getExtras()?.getString("text")
+            val position = data?.getExtras()?.getInt("position")
+            // Toast the name to display temporarily on screen
+            if (editedTask != null) {
+                listOfTasks[position!!] = editedTask
+            }
+            adapter.notifyDataSetChanged()
+
             saveItems()
         }
     }
